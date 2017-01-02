@@ -7,38 +7,43 @@ def encrypt(data)
 	$key = 	File.open("key.pem","r").read
 	$iv = File.open("iv.pem","r").read
 	enc = cipher.update(data) + cipher.final
+	File.open("das.txt","w").write(enc)
 	enc = Base64.encode64(enc)
-	afile = File.new("text.txt.enc","w")
-	afile.syswrite(enc)	
-	afile.close
+	File.open($file,"w").write(enc)
 end
 
 def decrypted(data)
 	decipher = OpenSSL::Cipher.new('AES-192-CBC')
 	decipher.decrypt
 	decipher.padding = 0
-	decipher.key = File.open("key.pem","r").read
-	decipher.iv = File.open("iv.pem","r").read
-	dec = decipher.update(data)+ decipher.final
-	File.open("text.txt","w").write(dec)
+	puts decipher.key = File.open("key.pem","r").read
+	puts decipher.iv = File.open("iv.pem","r").read
+	dec = decipher.update(data) + decipher.final
+	$file.slice! ".enc"
+	File.open($file,"w").write(dec)
 end
 
 
-	def login(name)
+	def login(name,pass)
 		uname = File.open("uname.pem","r").read
-		
-		if uname == name
+		password = File.open("pass.pem","r").read
+		if uname == name && pass == password
 				puts "1. Lock"
 				puts "2. Unlock"
 				act = gets.chomp!.to_i
 			if(act == 1)
-				puts "Enter data to be encrypted"
-				data = gets.chomp!
+				puts "Give the name of the file to be encrypted"
+				$file = gets.chomp!
+				data = File.open($file,"r").read
+				$file = $file + ".enc"
 				encrypt(data)
 			else
-			data = File.open("text.txt.enc","r").read
-			data = Base64.decode64(data)
-			decrypted(data)
+				$file = Dir["*.enc"].join("")
+				#puts $file.class
+			data = File.open($file,"r").read
+			d = Base64.decode64(data)
+			decrypted(d)
+			#puts data
 			end
 		else 
 			print "Wrong Entry"
@@ -51,7 +56,12 @@ if File::exists?("uname.pem")
 	c = OpenSSL::Digest::SHA1.new
 	enc = c.digest(username)
 	enc = Base64.encode64(enc)
-	login(enc)
+	print "Password: "
+	pass = gets.chomp!
+	c1 = OpenSSL::Digest::SHA1.new
+	enc1 = c1.digest(pass)
+	enc1 = Base64.encode64(enc1)
+	login(enc,enc1)
 else
 	puts "Entering Program for First time......"
 	print "Enter Username to Store: "
@@ -59,10 +69,16 @@ else
 	c = OpenSSL::Digest::SHA1.new
 	enc = c.digest(username)
 	enc = Base64.encode64(enc)
+	print "Enter password: "
+	pass = gets.chomp!
+	c = OpenSSL::Digest::SHA1.new
+	penc = c.digest(pass)
+	penc = Base64.encode64(penc)
 	cipher = OpenSSL::Cipher.new('AES-192-CBC')
 	cipher.encrypt
 	File.open("uname.pem","w").write(enc)
-	$key = cipher.random_key
+	File.open("pass.pem","w").write(penc)
+	$key = "somerandomkey1233"
 	File.open("key.pem","w").write($key)
 	$iv = cipher.random_iv
 	File.open("iv.pem","w").write($iv)
