@@ -4,8 +4,8 @@ require 'base64'
 def encrypt(data)
 	cipher = OpenSSL::Cipher.new('AES-192-CBC')
 	cipher.encrypt
-	$key = 	File.open("key.pem","r").read
-	$iv = File.open("iv.pem","r").read
+	$key = cipher.random_key
+	$iv = cipher.random_iv
 	enc = cipher.update(data) + cipher.final
 	File.open("das.txt","w").write(enc)
 	enc = Base64.encode64(enc)
@@ -16,8 +16,8 @@ def decrypted(data)
 	decipher = OpenSSL::Cipher.new('AES-192-CBC')
 	decipher.decrypt
 	decipher.padding = 0
-	puts decipher.key = File.open("key.pem","r").read
-	puts decipher.iv = File.open("iv.pem","r").read
+	puts decipher.key = $key
+	puts decipher.iv = $iv
 	dec = decipher.update(data) + decipher.final
 	$file.slice! ".enc"
 	File.open($file,"w").write(dec)
@@ -78,10 +78,6 @@ else
 	cipher.encrypt
 	File.open("uname.pem","w").write(enc)
 	File.open("pass.pem","w").write(penc)
-	$key = "somerandomkey1233"
-	File.open("key.pem","w").write($key)
-	$iv = cipher.random_iv
-	File.open("iv.pem","w").write($iv)
 	puts "Username Added..... Program Exiting..."
 end
 
