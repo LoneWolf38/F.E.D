@@ -10,8 +10,7 @@ def encrypt(data)
 	File.open("iv.pem","w").write($iv)
 	enc = cipher.update(data) + cipher.final
 	enc = Base64.encode64(enc)
-	$file = "../Encrypt/"+ $file
-	puts $file
+	$file = "../F.E.D/encrypt/text.enc"
 	File.open($file,"w").write(enc)
 end
 
@@ -22,7 +21,10 @@ def decrypted(data)
  	decipher.key = File.open("key.pem","r").read
 	decipher.iv = File.open("iv.pem","r").read
 	dec = decipher.update(data) + decipher.final
+	puts dec
+	$file.slice! "../F.E.D/encrypt"
 	$file.slice! ".enc"
+	$file = "../F.E.D/decrypt" + $file
 	File.open($file,"w").write(dec)
 end
 
@@ -41,12 +43,11 @@ end
 				$file = $file + ".enc"
 				encrypt(data)
 			else
-				$file = Dir["*.enc"].join("")
-				#puts $file.class
-			data = File.open($file,"r").read
-			d = Base64.decode64(data)
-			decrypted(d)
-			#puts data
+
+				$file = Dir["../F.E.D/encrypt/*.enc"].join("")
+				data = File.open($file,"r").read
+				d = Base64.decode64(data)
+				decrypted(d)
 			end
 		else 
 			print "Wrong Entry"
@@ -81,6 +82,8 @@ else
 	cipher.encrypt
 	File.open("uname.pem","w").write(enc)
 	File.open("pass.pem","w").write(penc)
-	puts "Username Added..... Program Exiting..."
+	Dir::mkdir("../F.E.D/encrypt")
+	Dir::mkdir("../F.E.D/decrypt")
+	puts "User Added..... Program Exiting..."
 end
 
