@@ -5,10 +5,13 @@ def encrypt(data)
 	cipher = OpenSSL::Cipher.new('AES-192-CBC')
 	cipher.encrypt
 	$key = cipher.random_key
+	File.open("key.pem","w").write($key)
 	$iv = cipher.random_iv
+	File.open("iv.pem","w").write($iv)
 	enc = cipher.update(data) + cipher.final
-	File.open("das.txt","w").write(enc)
 	enc = Base64.encode64(enc)
+	$file = "../Encrypt/"+ $file
+	puts $file
 	File.open($file,"w").write(enc)
 end
 
@@ -16,8 +19,8 @@ def decrypted(data)
 	decipher = OpenSSL::Cipher.new('AES-192-CBC')
 	decipher.decrypt
 	decipher.padding = 0
-	puts decipher.key = $key
-	puts decipher.iv = $iv
+ 	decipher.key = File.open("key.pem","r").read
+	decipher.iv = File.open("iv.pem","r").read
 	dec = decipher.update(data) + decipher.final
 	$file.slice! ".enc"
 	File.open($file,"w").write(dec)
