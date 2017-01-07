@@ -17,11 +17,10 @@ end
 def decrypted(data)
 	decipher = OpenSSL::Cipher.new('AES-192-CBC')
 	decipher.decrypt
-	decipher.padding = 0
+	#decipher.padding = 0
  	decipher.key = File.open("key.pem","r").read
 	decipher.iv = File.open("iv.pem","r").read
 	dec = decipher.update(data) + decipher.final
-	puts dec
 	$file.slice! "../F.E.D/encrypt"
 	$file.slice! ".enc"
 	$file = "../F.E.D/decrypt" + $file
